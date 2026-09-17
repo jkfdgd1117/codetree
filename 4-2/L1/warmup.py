@@ -1,16 +1,16 @@
-def sel(now, end):
-    if len(path) == end:
+def sel(L):
+    if len(path) == N:
         print(*path)
         return
-    for i in range(1, now):
+    for i in range(1, L+1):
         path.append(i)
-        sel(now+1, end)
+        sel(L)
         path.pop()
 
 K, N = map(int, input().split())
 
 path = []
-sel(K, N)
+sel(K)
 
 """
 K개 중에 1개를 N번 뽑기
