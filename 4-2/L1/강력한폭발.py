@@ -1,34 +1,46 @@
 bombr = [[1, 2, -1, -2], [0, 1, 0, -1], [1, 1, -1, -1]]
 bombc = [[0, 0, 0, 0], [1, 0, -1, 0], [1, -1, -1, 1]]
 bpath = [] # 설치한 폭탄들 좌표
-changed = [] # 폭탄 설치해서 바뀐 칸들 (재귀할때 돌려놔야함)
 def go(L):
+    global ans
     if len(bpath) == L:
-        print(bpath)
+        ret = bomb(bpath)
+        if ans < ret:
+            ans = ret
         return
     for i in range(3):
         bpath.append(i)
         go(L)
         bpath.pop()
 
-def bomb(r, c, bombtype):
+def bomb(bombs):    # bombs로 각 폭탄 자리별 무슨 폭탄 놓을지 리스트가 들어옴
     global ans
-    for w in range(4):
-        if (0<=r+bombr[bombtype][w]<=(n-1)) and (0<=c+bombc[bombtype][w]<=(n-1)):
-            if grid[r+bombr[bombtype][w]][c+bombc[bombtype][w]] == 0:
-                grid[r+bombr[bombtype][w]][c+bombc[bombtype][w]] = 2
-                changed.append([r+bombr[bombtype][w], c+bombc[bombtype][w]])
+    hap = 0
+    temp = [[0]*n for _ in range(n)]
+    for i in range(len(bombs)):
+        nr = plant[i][0]
+        nc = plant[i][1]
+        if not temp[nr][nc]:
+            temp[nr][nc] = 1
+            hap += 1
+        for w in range(4):
+            if (0<=nr+bombr[bombs[i]][w]<n) and (0<=nc+bombc[bombs[i]][w]<n):    
+                if not temp[nr+bombr[bombs[i]][w]][nc+bombc[bombs[i]][w]]:
+                    temp[nr+bombr[bombs[i]][w]][nc+bombc[bombs[i]][w]] = 1
+                    hap += 1
+    return hap
 
 
 n = int(input())
 grid = [list(map(int, input().split())) for _ in range(n)]
-bombs = []
+plant = []
+ans = 0
 for r in range(n):
     for c in range(n):
-        if grid[r][c] == 1:
-            bombs.append([r, c])
-go(len(bombs))
-ans = 0
+        if grid[r][c]:
+            plant.append((r, c))
+go(len(plant))
+print(ans)
 
 
 
@@ -48,4 +60,13 @@ ans = 0
 십자 폭탄: 폭탄 위치와 상·하·좌·우로 인접한 4칸, 총 5칸을 초토화합니다.
 X자 폭탄: 폭탄 위치와 네 대각선 방향으로 인접한 4칸, 총 5칸을 초토화합니다.
 초토화 범위가 격자 밖으로 나가는 경우 그 부분은 무시하며, 격자 안에 걸치는 칸만 초토화됩니다.
+
+걍 순열만들고 최종검사만 하는게 나을듯
+
+각 자리별 뭔폭탄 놓을지 결정한 중복순열 리스트
+리스트 순회하면서 i번 자리에 b의 폭탄 발파
+b의 폭탄이 발파하는 범위는 
+for w in range(4):
+    temp[plant[i][0]+bombr[b][w]][plant[i][1]+bombc[b][w]]
+
 """
